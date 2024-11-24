@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <h1 class="text-center text-primary">Upload an Image for Object Detection</h1>
+    <form action="/upload" enctype="multipart/form-data" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="file" class="form-label">Choose an image</label>
+            <input type="file" name="file" id="file" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload Image</button>
+    </form>
+
+    <div id="result" class="mt-4" style="display: none;">
+        <h2 class="text-success">Results</h2>
+        <div id="result-image"></div>
+        <ul>
+            <li><a href="/save-json" class="btn btn-outline-success" id="download-json">Download JSON</a></li>
+            <li><a href="/save-image" class="btn btn-outline-info" id="download-image">Download Image with Bounding Boxes</a></li>
+        </ul>
+    </div>
+</div>
+
+<!-- Bootstrap JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const form = document.querySelector('form');
+    form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+
+        if (response.ok) {
+            // Display result section
+            document.getElementById('result').style.display = 'block';
+            
+            // Show the result image
+            const resultImage = document.getElementById('result-image');
+            resultImage.innerHTML = `<img src="data:image/jpeg;base64,${data.image_base64}" class="img-fluid" alt="Processed Image">`;
+
+            // Update download links with the URLs
+            document.getElementById('download-json').href = data.json_url;
+            document.getElementById('download-image').href = data.image_url;
+        } else {
+            alert('Error: ' + data.error);
+        }
+    }
+</script>
+</body>
+</html>

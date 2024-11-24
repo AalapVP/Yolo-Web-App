@@ -1,0 +1,22 @@
+services:
+  ui-backend:
+    build:
+      context: ./ui-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - ai-backend
+    networks:
+      - app-network
+  
+  ai-backend:
+    build:
+      context: ./ai-backend
+    ports:
+      - "8001:8001"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
